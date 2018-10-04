@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\contacts;
+use App\Contact;
 use Illuminate\Http\Request;
 
 class ContactsController extends Controller
@@ -14,7 +14,8 @@ class ContactsController extends Controller
      */
     public function index()
     {
-        //
+        $contacts = Contact::all();
+        return view('contacts.index')->with('contacts', $contacts);
     }
 
     /**
@@ -24,7 +25,7 @@ class ContactsController extends Controller
      */
     public function create()
     {
-        //
+        return view('contacts.create');
     }
 
     /**
@@ -35,7 +36,12 @@ class ContactsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        request()->validate([
+            'name' => 'required',
+            'email' => 'required',
+        ]);
+        Contact::create($request->all());
+        return redirect()->route('contacts.index')->with('success', 'Contact added successfully');
     }
 
     /**
@@ -55,9 +61,10 @@ class ContactsController extends Controller
      * @param  \App\contacts  $contacts
      * @return \Illuminate\Http\Response
      */
-    public function edit(contacts $contacts)
+    public function edit($id)
     {
-        //
+        $contact = Contact::find($id);
+        return view('contacts.edit', compact('contact'));
     }
 
     /**
@@ -67,9 +74,14 @@ class ContactsController extends Controller
      * @param  \App\contacts  $contacts
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, contacts $contacts)
+    public function update(Request $request, $id)
     {
-        //
+        request()->validate([
+            'name' => 'required',
+            'email' => 'required',
+        ]);
+        Contact::find($id)->update($request->all());
+        return redirect()->route('contacts.index')->with('success', 'Contact updated successfully');
     }
 
     /**
@@ -78,8 +90,9 @@ class ContactsController extends Controller
      * @param  \App\contacts  $contacts
      * @return \Illuminate\Http\Response
      */
-    public function destroy(contacts $contacts)
+    public function destroy($id)
     {
-        //
+        Contact::find($id)->delete();
+        return redirect()->route('contacts.index')->with('success', 'Contact deleted successfully');
     }
 }
